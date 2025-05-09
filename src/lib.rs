@@ -6,10 +6,22 @@ pub struct Hsl {
     pub l: u8,
 }
 
+impl std::fmt::Display for Hsl {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "hsl({}, {}, {})", self.h, self.s, self.l)
+    }
+}
+
 pub struct Rgb {
     pub r: u8,
     pub g: u8,
     pub b: u8,
+}
+
+impl std::fmt::Display for Rgb {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "rgb({}, {}, {})", self.r, self.g, self.b)
+    }
 }
 
 pub struct Color {
@@ -19,7 +31,7 @@ pub struct Color {
 }
 
 impl Color {
-    fn new(rgb: Rgb, proportion: f32) -> Color {
+    pub fn new(rgb: Rgb, proportion: f32) -> Color {
         let hsl = rgb_to_hsl(&rgb);
         Color {
             rgb,
