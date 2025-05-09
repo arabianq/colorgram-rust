@@ -1,6 +1,6 @@
 [package]
 name = "colorgram"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["arabian"]
 description = "Rust library that extracts colors from image. Port of colorgram.py"
