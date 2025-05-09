@@ -1,0 +1,31 @@
+[package]
+name = "colorgram"
+version = "0.1.0"
+edition = "2024"
+authors = ["arabian"]
+description = "Rust library that extracts colors from image. Port of colorgram.py"
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/arabianq/colorgram-rust"
+repository = "https://github.com/arabianq/colorgram-rust"
+keywords = ["colors", "image", "extract", "colorgram"]
+
+
+[dependencies]
+image = { version = "0.25.6", features = ["default-formats"] }
+clap = { version = "4.5.37", features = ["derive"] }
+
+[lib]
+name = "colorgram"
+path = "src/lib.rs"
+
+[[bin]]
+name = "colorgram-cli"
+path = "src/main.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "z"
+panic = "abort"
