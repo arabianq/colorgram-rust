@@ -12,9 +12,9 @@ keywords = ["colors", "image", "extract", "colorgram"]
 
 
 [dependencies]
-image = { version = "0.25.6", features = ["default-formats"] }
-clap = { version = "4.5.41", features = ["derive"] }
-ansi_term = { version = "0.12.1" }
+image = { version = "0.25.6", default-features = false, features = ["default-formats"] }
+clap = { version = "4.5.41", default-features = false, features = ["derive", "std"] }
+ansi_term = { version = "0.12.1", default-features = false }
 
 [lib]
 name = "colorgram"
