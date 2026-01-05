@@ -121,7 +121,8 @@ pub fn extract<P: AsRef<std::path::Path>>(
 
     used.sort_unstable_by(|a, b| b.0.cmp(&a.0));
 
-    let top_used = &used[..number_of_color];
+    let nmin = number_of_color.min(used.len());
+    let top_used = &used[..nmin];
     let sum_counts: u32 = top_used.iter().map(|&(count, _)| count).sum();
 
     let mut colors = Vec::with_capacity(number_of_color);
