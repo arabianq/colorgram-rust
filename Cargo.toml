@@ -12,8 +12,13 @@ keywords = ["colors", "image", "extract", "colorgram"]
 
 
 [dependencies]
-image = { version = "0.25.8", default-features = false, features = ["default-formats"] }
-clap = { version = "4.5.47", default-features = false, features = ["derive", "std"] }
+image = { version = "0.25.9", default-features = false, features = [
+    "default-formats",
+] }
+clap = { version = "4.5.54", default-features = false, features = [
+    "derive",
+    "std",
+] }
 ansi_term = { version = "0.12.1", default-features = false }
 
 [lib]
