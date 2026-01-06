@@ -1,4 +1,9 @@
 use image;
+use std::{
+    error::Error,
+    fmt::{Display, Formatter, Result as fmtResult},
+    path::Path,
+};
 
 pub struct Hsl {
     pub h: u8,
@@ -6,8 +11,8 @@ pub struct Hsl {
     pub l: u8,
 }
 
-impl std::fmt::Display for Hsl {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl Display for Hsl {
+    fn fmt(&self, f: &mut Formatter) -> fmtResult {
         write!(f, "hsl({}, {}, {})", self.h, self.s, self.l)
     }
 }
@@ -18,8 +23,8 @@ pub struct Rgb {
     pub b: u8,
 }
 
-impl std::fmt::Display for Rgb {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl Display for Rgb {
+    fn fmt(&self, f: &mut Formatter) -> fmtResult {
         write!(f, "rgb({}, {}, {})", self.r, self.g, self.b)
     }
 }
@@ -73,10 +78,10 @@ fn rgb_to_hsl(rgb: &Rgb) -> Hsl {
     Hsl { h, s, l: l as u8 }
 }
 
-pub fn extract<P: AsRef<std::path::Path>>(
+pub fn extract<P: AsRef<Path>>(
     path: P,
     number_of_color: usize,
-) -> Result<Vec<Color>, Box<dyn std::error::Error>> {
+) -> Result<Vec<Color>, Box<dyn Error>> {
     let img = image::open(path)?;
     let img = img.to_rgb8();
 
