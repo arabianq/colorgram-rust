@@ -4,6 +4,11 @@ use std::{
     fmt::{Display, Formatter, Result as fmtResult},
 };
 
+/// Represents a color in the HSL (Hue, Saturation, Lightness) color space.
+///
+/// Note: In this implementation, values are stored as `u8` (0-255) rather than
+/// the standard degrees (0-360) and percentages (0-100), following the
+/// integer-based logic inherited from `colorgram.py`.
 #[derive(PartialEq, Eq, Debug)]
 pub struct Hsl {
     pub h: u8,
@@ -17,6 +22,7 @@ impl Display for Hsl {
     }
 }
 
+/// Represents a color in the RGB (Red, Green, Blue) color space.
 #[derive(PartialEq, Eq, Debug)]
 pub struct Rgb {
     pub r: u8,
@@ -30,14 +36,24 @@ impl Display for Rgb {
     }
 }
 
+/// A structure representing an extracted color, its HSL equivalent,
+/// and its prevalence in the image.
 #[derive(PartialEq, Debug)]
 pub struct Color {
+    /// The average RGB color of the cluster.
     pub rgb: Rgb,
+    /// The HSL representation (calculated using the bug-compatible `rgb_to_hsl`).
     pub hsl: Hsl,
+    /// The proportion of this color in the image (range 0.0 to 1.0).
     pub proportion: f32,
 }
 
 impl Color {
+    /// Creates a new `Color` instance and automatically calculates its HSL value.
+    ///
+    /// ### Arguments:
+    /// * `rgb` - The base RGB color.
+    /// * `proportion` - The weight of this color relative to others.
     pub fn new(rgb: Rgb, proportion: f32) -> Color {
         let hsl = rgb_to_hsl(&rgb);
         Color {
@@ -48,6 +64,25 @@ impl Color {
     }
 }
 
+/// Converts RGB color space to HSL.
+///
+/// ### ⚠️ Bug-compatibility Warning:
+/// This function **does not** produce a mathematically correct HSL value. It contains
+/// specific calculation errors inherited from the original `colorgram.py` library.
+/// These deviations are preserved intentionally to ensure that the color extraction
+/// results remain identical to the Python implementation.
+///
+/// ### Implementation Details:
+/// * **Luminance (L)**: Calculated as the average of the most and least dominant components.
+/// * **Saturation (S)**: Scaled to 0-255 range using integer division that may lose precision.
+/// * **Hue (H)**: Calculated using a 0-255 scale (instead of 0-360°) with custom offsets
+///   (1530, 510, 1020) and integer math.
+///
+/// ### Arguments:
+/// * `rgb` - A reference to the input `Rgb` struct.
+///
+/// ### Returns:
+/// * `Hsl` - The "colorgram-style" HSL representation.
 fn rgb_to_hsl(rgb: &Rgb) -> Hsl {
     let r = rgb.r as i32;
     let g = rgb.g as i32;
@@ -80,6 +115,35 @@ fn rgb_to_hsl(rgb: &Rgb) -> Hsl {
     Hsl { h, s, l: l as u8 }
 }
 
+/// Extracts a palette of dominant colors from an image buffer.
+///
+/// ### Process:
+/// 1. **Decoding**: Loads the image from the provided byte buffer and converts it to RGB8.
+/// 2. **Quantization**: Pixels are grouped into "buckets" based on a simplified 6-bit key
+///    derived from Luminance (Y), Hue (H), and Lightness (L).
+/// 3. **Aggregation**: Sums the R, G, and B components and counts pixels in each bucket.
+/// 4. **Averaging**: Calculates the mean color for each non-empty bucket.
+/// 5. **Selection**: Returns the top `number_of_color` most frequent colors.
+///
+/// ### Arguments:
+/// * `buffer` - A byte slice containing encoded image data (e.g., JPEG, PNG).
+/// * `number_of_color` - The maximum number of dominant colors to return.
+///
+/// ### Example:
+/// ```rust
+/// use colorgram::{extract, Color};
+/// use std::fs;
+///
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let buf = fs::read("image.jpg")?;
+///     let colors = extract(&buf, 5)?;
+///
+///     for color in colors {
+///         println!("Color: {}, Weight: {:.2}%", color.rgb, color.proportion * 100.0);
+///     }
+///     Ok(())
+/// }
+/// ```
 pub fn extract(buffer: &[u8], number_of_color: usize) -> Result<Vec<Color>, Box<dyn Error>> {
     let img = image::load_from_memory(buffer)?;
     let img = img.to_rgb8();
