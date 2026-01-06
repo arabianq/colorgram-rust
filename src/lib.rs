@@ -4,6 +4,7 @@ use std::{
     fmt::{Display, Formatter, Result as fmtResult},
 };
 
+#[derive(PartialEq, Eq, Debug)]
 pub struct Hsl {
     pub h: u8,
     pub s: u8,
@@ -16,6 +17,7 @@ impl Display for Hsl {
     }
 }
 
+#[derive(PartialEq, Eq, Debug)]
 pub struct Rgb {
     pub r: u8,
     pub g: u8,
@@ -28,6 +30,7 @@ impl Display for Rgb {
     }
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Color {
     pub rgb: Rgb,
     pub hsl: Hsl,
@@ -132,4 +135,68 @@ pub fn extract(buffer: &[u8], number_of_color: usize) -> Result<Vec<Color>, Box<
     }
 
     Ok(colors)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn test_rgb_to_hsl() {
+        let rgb = Rgb { r: 0, g: 0, b: 0 };
+        let hsl = rgb_to_hsl(&rgb);
+        assert_eq!(hsl, Hsl { h: 0, s: 0, l: 0 });
+
+        let rgb = Rgb {
+            r: 255,
+            g: 255,
+            b: 255,
+        };
+        let hsl = rgb_to_hsl(&rgb);
+        assert_eq!(hsl, Hsl { h: 0, s: 0, l: 255 });
+
+        let rgb = Rgb {
+            r: 100,
+            g: 20,
+            b: 30,
+        };
+        let hsl = rgb_to_hsl(&rgb);
+        assert_eq!(
+            hsl,
+            Hsl {
+                h: 249,
+                s: 170,
+                l: 60
+            }
+        );
+    }
+
+    #[test]
+    fn test_extract() {
+        let buf = fs::read("test.png").unwrap();
+        let colors = extract(&buf, 1).unwrap();
+
+        assert_eq!(
+            colors,
+            vec![Color {
+                rgb: Rgb {
+                    r: 214,
+                    g: 163,
+                    b: 101
+                },
+                hsl: Hsl {
+                    h: 23,
+                    s: 147,
+                    l: 157
+                },
+                proportion: 1.0
+            }]
+        );
+
+        let colors = extract(&buf, 1000).unwrap();
+        let amount_of_colors = colors.len();
+
+        assert_eq!(amount_of_colors, 35);
+    }
 }
