@@ -2,7 +2,6 @@ use image;
 use std::{
     error::Error,
     fmt::{Display, Formatter, Result as fmtResult},
-    path::Path,
 };
 
 pub struct Hsl {
@@ -78,11 +77,8 @@ fn rgb_to_hsl(rgb: &Rgb) -> Hsl {
     Hsl { h, s, l: l as u8 }
 }
 
-pub fn extract<P: AsRef<Path>>(
-    path: P,
-    number_of_color: usize,
-) -> Result<Vec<Color>, Box<dyn Error>> {
-    let img = image::open(path)?;
+pub fn extract(buffer: &[u8], number_of_color: usize) -> Result<Vec<Color>, Box<dyn Error>> {
+    let img = image::load_from_memory(buffer)?;
     let img = img.to_rgb8();
 
     let mut samples = vec![0u32; 4 * 4096];

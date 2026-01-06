@@ -28,7 +28,10 @@ fn main() {
     assert!(input_path.is_file(), "Input path is not a file");
     assert!(colors_amount > 0, "Colors amount must be greater than zero");
 
-    match extract(input_path, colors_amount) {
+    let img = image::open(input_path).unwrap();
+    let buf = img.as_bytes();
+
+    match extract(buf, colors_amount) {
         Ok(colors) => {
             for color in colors {
                 let style = Style::new()
