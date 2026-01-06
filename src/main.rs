@@ -3,6 +3,7 @@ use clap::Parser;
 use colorgram::extract;
 use std::{
     error::Error,
+    fs,
     path::{PathBuf, absolute},
 };
 
@@ -31,10 +32,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     assert!(input_path.is_file(), "Input path is not a file");
     assert!(colors_amount > 0, "Colors amount must be greater than zero");
 
-    let img = image::open(input_path)?;
-    let buf = img.as_bytes();
+    let buf = fs::read(input_path)?;
 
-    match extract(buf, colors_amount) {
+    match extract(&buf, colors_amount) {
         Ok(colors) => {
             for color in colors {
                 let style = Style::new()
