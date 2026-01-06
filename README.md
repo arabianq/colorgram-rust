@@ -25,14 +25,15 @@ colorgram = "0.1.0"
 
 ```rust
 use colorgram::extract;
+use std::fs;
 
-fn main() {
-    let img_path = "test.png";
-    let colors_amount = 10;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let buf = fs::read("image.jpg")?;
+    let colors = extract(&buf, 5)?;
 
-    let colors = extract(img_path, colors_amount).unwrap();
     for color in colors {
-        println!("RGB: {} {} {} HSL: {} {} {} Proportion: {:.2}", color.rgb.r, color.rgb.g, color.rgb.b, color.hsl.h, color.hsl.s, color.hsl.l, color.proportion);
+        println!("Color: {}, Weight: {:.2}%", color.rgb, color.proportion * 100.0);
     }
+    Ok(())
 }
 ```

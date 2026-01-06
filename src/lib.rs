@@ -131,7 +131,7 @@ fn rgb_to_hsl(rgb: &Rgb) -> Hsl {
 ///
 /// ### Example:
 /// ```rust
-/// use colorgram::{extract, Color};
+/// use colorgram::extract;
 /// use std::fs;
 ///
 /// fn main() -> Result<(), Box<dyn std::error::Error>> {
