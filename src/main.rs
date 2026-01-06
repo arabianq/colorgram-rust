@@ -1,7 +1,10 @@
 use ansi_term::{Color::RGB, Style};
 use clap::Parser;
 use colorgram::extract;
-use std::path::{PathBuf, absolute};
+use std::{
+    error::Error,
+    path::{PathBuf, absolute},
+};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -18,17 +21,17 @@ struct Args {
     colors_amount: usize,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
-    let input_path = absolute(&args.input_file).unwrap();
+    let input_path = absolute(&args.input_file)?;
     let colors_amount = args.colors_amount;
 
     assert!(input_path.exists(), "Input file does not exist");
     assert!(input_path.is_file(), "Input path is not a file");
     assert!(colors_amount > 0, "Colors amount must be greater than zero");
 
-    let img = image::open(input_path).unwrap();
+    let img = image::open(input_path)?;
     let buf = img.as_bytes();
 
     match extract(buf, colors_amount) {
@@ -45,5 +48,7 @@ fn main() {
             }
         }
         Err(e) => eprintln!("Error: {}", e),
-    }
+    };
+
+    Ok(())
 }
